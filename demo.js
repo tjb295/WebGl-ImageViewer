@@ -6,11 +6,29 @@ in vec4 a_position;
 in vec2 a_texcoord;
 in vec4 translation;
 in mat4 u_formMatrix;
+in mat4 Pmatrix;
+in mat4 Vmatrix;
+in mat4 Mmatrix;
 
 out vec2 v_texcoord;
 
 void main() {
-  gl_Position = a_position + translation + u_formMatrix;
+  if(to_translate){
+    gl_Position = a_position + translation;
+  }
+  else if(to_scale){
+    gl_Position = a_position +  u_formMatrix;
+  }
+  else if(to_rotate){
+    gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(a_position, 1.);
+  }
+  else if(to_shear){
+
+  }
+  else{
+    gl_Position = a_position;
+  }
+  
   v_texcoord = a_texcoord;
 }
 `;
@@ -67,6 +85,11 @@ function main(to_translate, to_rotate, to_scale, to_shear) {
   var positionLocation = gl.getAttribLocation(program, "a_position");
   var texcoordLocation = gl.getAttribLocation(program, "a_texcoord");
   var textureLocation = gl.getUniformLocation(program, "u_texture");
+
+  //create matrixes
+  var Pmatrix = gl.getUniformLocation(program, "Pmatrix");
+  var Vmatrix = gl.getUniformLocation(program, "Vmatrix");
+  var Mmatrix = gl.getUniformLocation(program, "Mmatrix");
 
   var vao = gl.createVertexArray();
 
@@ -128,6 +151,11 @@ function main(to_translate, to_rotate, to_scale, to_shear) {
   }
 
   var image = loadTexture('stone1.png');
+
+  //rotating
+  if (to_rotate){
+
+  }
 
   //translation
   if(to_translate){

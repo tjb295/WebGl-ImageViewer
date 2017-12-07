@@ -4,11 +4,12 @@ var vertexShaderSource = `#version 300 es
 
 in vec4 a_position;
 in vec2 a_texcoord;
+in vec4 translation;
 
 out vec2 v_texcoord;
 
 void main() {
-  gl_Position = a_position;
+  gl_Position = a_position + translation;
   v_texcoord = a_texcoord;
 }
 `;
@@ -85,7 +86,6 @@ function main() {
   gl.enableVertexAttribArray(positionLocation);
 
 
-
   gl.vertexAttribPointer(
       positionLocation, 2, gl.FLOAT, false, 0, 0);
 
@@ -107,7 +107,10 @@ function main() {
       texcoordLocation, 2, gl.FLOAT, true, 0, 0);
 
   //translation
-      
+  var Tx = 0.5, Ty = 0.5, Tz = 0.5;
+  var translation = gl.getUniformLocation(program, 'translation');
+  gl.uniform4f(translation, Tx, Ty, Tx, 0.0);
+
 
   function loadTexture(url) {
     var tex = gl.createTexture();

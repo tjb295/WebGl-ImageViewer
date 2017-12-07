@@ -1,4 +1,7 @@
-var translate = true;
+var to_translate = true;
+var to_scale = false;
+var to_shear = false;
+var to_rotate = false;
 
 var vertexShaderSource = `#version 300 es
 
@@ -106,10 +109,7 @@ function main() {
   gl.vertexAttribPointer(
       texcoordLocation, 2, gl.FLOAT, true, 0, 0);
 
-  //translation
-  var Tx = 0.5, Ty = 0.5, Tz = 0.5;
-  var translation = gl.getUniformLocation(program, 'translation');
-  gl.uniform4f(translation, Tx, Ty, Tx, 0.0);
+  
 
 
   function loadTexture(url) {
@@ -131,6 +131,14 @@ function main() {
 
   var image = loadTexture('stone1.png');
 
+  //translation
+  if(to_translate){
+    var translation = gl.getUniformLocation(program, 'translation');
+    gl.uniform4f(translation, 0.5, 0.5, 0, 0.0);
+  }
+  
+
+
   function draw() {
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
@@ -150,18 +158,17 @@ function main() {
 
   }
 
+
   function render(time) {
     draw();
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);
+  to_translate = false;
 
-  //translate
-  function translate(){
-    //pass translation distances in such as Tx, and Ty
-    //assign result to gl_position
-    
-  }
 }
+
+document.getElementById("translate").addEventListener("click", main);
+
 
 main();

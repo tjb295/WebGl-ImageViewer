@@ -4,34 +4,58 @@ var vertexShaderSource = `#version 300 es
 
 in vec4 a_position;
 in vec2 a_texcoord;
-in vec4 translation;
-in mat4 u_formMatrix;
-in mat4 Pmatrix;
-in mat4 Vmatrix;
-in mat4 Mmatrix;
 
 out vec2 v_texcoord;
 
 void main() {
-  if(to_translate){
-    gl_Position = a_position + translation;
-  }
-  else if(to_scale){
-    gl_Position = a_position +  u_formMatrix;
-  }
-  else if(to_rotate){
-    gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(a_position, 1.);
-  }
-  else if(to_shear){
-
-  }
-  else{
-    gl_Position = a_position;
-  }
   
+  gl_Position = a_position;
   v_texcoord = a_texcoord;
 }
 `;
+
+var vertexShaderTranslate = `
+in vec4 a_position;
+in vec2 a_texcoord;
+in vec4 translation;
+
+out vec2 v_texcoord;
+
+void main() {
+  gl_Position = a_position + translation;
+  v_texcoord = a_texcoord;
+}`;
+
+var vertexShaderScale = `
+  in vec4 a_position;
+  in vec2 a_texcoord;
+  in mat4 u_formMatrix;
+
+  out vec2 v_texcoord;
+
+  void main() {
+    gl_Position = a_position + u_formMatrix;
+    v_texcoord = a_texcoord;
+  }
+`
+;
+
+var vertexShaderRotate = `
+  in vec4 a_position;
+  in vec2 texcoord;
+
+  in mat4 Pmatrix;
+  in mat4 Vmatrix;
+  in mat4 Mmatrix;
+  
+  out vec2 v_texcoord;
+
+  void main() {
+    gl_Position = Pmatrix*Vmatrix*Mmatrix*vec4(a_position, 1.);
+    v_texcoord = a_texcoord;
+  }
+`
+
 
 
 var fragmentShaderSource = `#version 300 es
@@ -64,8 +88,13 @@ function loadProgram(gl) {
   var shader = loadShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);
   gl.attachShader(program, shader);
 
-  shader = loadShader(gl, vertexShaderSource, gl.VERTEX_SHADER);
-  gl.attachShader(program, shader);
+  if(to_translate){
+    shader = loadShader(gl, vertexShaderTranslate, gl.VERTEX_SHADER);
+  }
+  else{
+    shader = loadShader(gl, vertexShaderSource, gl.VERTEX_SHADER);
+  }
+    gl.attachShader(program, shader);
 
   gl.linkProgram(program);
 

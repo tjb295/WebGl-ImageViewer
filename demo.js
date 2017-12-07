@@ -1,18 +1,16 @@
-var to_translate = true;
-var to_scale = false;
-var to_shear = false;
-var to_rotate = false;
+
 
 var vertexShaderSource = `#version 300 es
 
 in vec4 a_position;
 in vec2 a_texcoord;
 in vec4 translation;
+in mat4 u_formMatrix;
 
 out vec2 v_texcoord;
 
 void main() {
-  gl_Position = a_position + translation;
+  gl_Position = a_position + translation + u_formMatrix;
   v_texcoord = a_texcoord;
 }
 `;
@@ -56,7 +54,7 @@ function loadProgram(gl) {
   return program;
 }
 
-function main() {
+function main(to_translate, to_rotate, to_scale, to_shear) {
   var canvas = document.getElementById("canvas");
   var gl = canvas.getContext("webgl2");
 
@@ -133,8 +131,12 @@ function main() {
 
   //translation
   if(to_translate){
+    var x = document.getElementById("x").value;
+    var y = document.getElementById("y").value;
+    console.log(x);
+    console.log(y);
     var translation = gl.getUniformLocation(program, 'translation');
-    gl.uniform4f(translation, 0.5, 0.5, 0, 0.0);
+    gl.uniform4f(translation, x, y, 0, 0.0);
   }
   
 
@@ -146,6 +148,23 @@ function main() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     gl.useProgram(program);
+
+    //scaling
+    if(to_scale){
+      var x = document.getElementById("x").value;
+      var y = document.getElementById("y").value;
+
+      var formMatrix = new Float32Array([
+          x, 0.0, 0.0, 0.0,
+        0.0,   y, 0.0, 0,0,
+        0.0, 0.0, 0.0 ,0.0,
+        0.0, 0.0, 0.0, 0.0,
+
+      ]);
+
+      var u_formMatrix = gl.getUniformLocation(program, 'u_formMatrix');
+      gl.uniformMatrix4fv(u_formMatrix, false, formMatrix);
+    }
 
     gl.bindVertexArray(vao);
 
@@ -168,7 +187,27 @@ function main() {
 
 }
 
-document.getElementById("translate").addEventListener("click", main);
+document.getElementById("translate").addEventListener("click", translate);
+document.getElementById("rotate").addEventListener("click", rotate);
+document.getElementById("scale").addEventListener("click", scale);
+document.getElementById("shear").addEventListener("click", shear);
+
+function translate(){
+  main(true, false,false,false);
+}
+
+function rotate(){
+  main(false, true, false, false);
+}
+
+function scale(){
+  main(false, false, true, false);
+}
+
+function shear(){
+  main(false, false, false, true);
+}
 
 
-main();
+
+main(false,false,false,false);

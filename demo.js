@@ -1,3 +1,10 @@
+var fileUpload = document.getElementbyId('file');
+
+
+
+fileUpload.onchange = main;
+
+
 var vertexShaderSource = `#version 300 es
 
 in vec4 a_position;
@@ -105,6 +112,8 @@ function main() {
   gl.vertexAttribPointer(
       texcoordLocation, 2, gl.FLOAT, true, 0, 0);
 
+
+
   function loadTexture(url) {
     var tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -122,7 +131,9 @@ function main() {
     return tex;
   }
 
-  var image = loadTexture('stone1.png');
+  
+
+  var image = loadTexture(fileUpload.value);
 
   function draw() {
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
